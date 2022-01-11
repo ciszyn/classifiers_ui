@@ -1,0 +1,168 @@
+App:
+
+<ContentNavigationDrawer@ScrollView>:
+    MDList:
+        OneLineIconListItem:
+            text: "Spectrograms"
+            on_press:
+                root.nav_drawer.set_state("close")
+                root.screen_manager.current = "spectrograms"
+            IconLeftWidget:
+                icon: "poll"
+        OneLineIconListItem:
+            text: "Classification"
+            on_press:
+                root.nav_drawer.set_state("close")
+                root.screen_manager.current = "classification"
+            IconLeftWidget:
+                icon: "music-note"
+        OneLineIconListItem:
+            text: "File Explorer"
+            on_press:
+                root.nav_drawer.set_state("close")
+                root.screen_manager.current = "fileExplorer"
+            IconLeftWidget:
+                icon: "file-outline"
+        OneLineIconListItem:
+            text: "Settings"
+            on_press:
+                app.open_settings()
+            IconLeftWidget:
+                icon: "cog-outline"
+
+
+<ItemDrawer>:
+    theme_text_color: "Custom"
+    on_release: self.parent.set_color_item(self)
+
+    IconLeftWidget:
+        id: icon
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: root.text_color
+
+<App>:
+    Screen:
+        BoxLayout:
+            orientation: "vertical"
+            MDToolbar:
+                id: toolbar
+                pos_hint: {"top": 1}
+                elevation: 10
+                title: root.folder
+                left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+            MDNavigationLayout:
+                x: toolbar.height
+                ScreenManager:
+                    id: screen_manager
+                    Screen:
+                        name: "spectrograms"
+                        SpectrogramsWidget:
+                    Screen:
+                        name: "classification"
+                        ClassificationWidget:
+                    Screen:
+                        name: "fileExplorer"
+                        FileWidget:
+                    Screen:
+                        name: "settings"
+                        SettingsWidget:
+                MDNavigationDrawer:
+                    id: nav_drawer
+                    ContentNavigationDrawer:
+                        screen_manager: screen_manager
+                        nav_drawer: nav_drawer
+
+<SpectrogramsWidget>:
+    orientation: 'vertical'
+    spinner: spinner
+    BoxLayout:
+        id: layout
+        orientation: "horizontal"
+        BoxLayout:
+            size_hint_x: 0.3
+            orientation: "vertical"
+            ScrollView:
+                bar_width: "10dp"
+                scroll_type: ['bars']
+                MDList:
+                    id: list
+            Button:
+                size_hint_y: 0.05
+                text: "Save"
+                on_press: root.save()
+        AnchorLayout:
+            anchor_x: "center"
+            anchor_y: "center"
+            orientation: "vertical"
+            MDSpinner:
+                id: spinner
+                size_hint: None, None
+                size: dp(46), dp(46)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                active: False
+            BoxLayout:
+                orientation: "vertical"
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    bar_width: "10dp"
+                    scroll_type: ['bars']
+                    BoxLayout:
+                        orientation: "vertical"
+                        size_hint_x: None
+                        width: self.parent.width
+                        size_hint_y: None
+                        adaptive_height: True
+                        id: images
+
+<ClassificationWidget>:
+    orientation: 'vertical'
+    spinner: spinner
+    BoxLayout:
+        id: layout
+        orientation: "horizontal"
+        ScrollView:
+            bar_width: "10dp"
+            scroll_type: ['bars']
+            size_hint_x: 0.3
+            MDList:
+                id: list
+        AnchorLayout:
+            anchor_x: "center"
+            anchor_y: "center"
+            # BoxLayout:
+            #     orientation: "vertical"
+            #     size_hint: 0.2, 0.2
+            #     Button:
+            #         text: "Click"
+            MDSpinner:
+                id: spinner
+                size_hint: None, None
+                size: dp(46), dp(46)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                active: False
+            BoxLayout:
+                orientation: "vertical"
+                id: plot
+            
+
+<FileWidget>:
+    orientation: "vertical"
+    FileChooserIconView:
+        id: filechooser
+        on_selection: root.text_input = self.selection[0]
+        dirselect: True
+    BoxLayout:
+        size_hint_y: None
+        orientation: "horizontal"
+        Button:
+            size_hint_y: None
+            height: "31dp"
+            text: "Open Folder"
+            on_press: root.navigate()
+        MDLabel:
+            text: root.text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
